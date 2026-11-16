@@ -438,25 +438,29 @@ private:
         copy.onClick=[this]{captureSetup(1-activeSetup);};
         setup.onClick=[this]{captureSetup(activeSetup);activeSetup=1-activeSetup;auto& b=setupStates[size_t(activeSetup)];processor.setStateInformation(b.getData(),int(b.getSize()));captureCleanState();};
         save.onClick=[this]{fileDialog(true);};
-        menu.onClick=[this]{
+        menu.onClick=[this]{showMenu();};
+    }
+    void showMenu()
+    {
             juce::PopupMenu m;m.addItem(1,"Load preset…");m.addSeparator();
             m.addItem(2,"Bypass",true,processor.value("bypass")>.5f);m.addSeparator();
             m.addItem(3,"Interface 50%");m.addItem(4,"Interface 67%");m.addItem(5,"Interface 100% (1592 px)");m.addSeparator();m.addItem(6,"About MixDown Study");
-            m.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(&menu),[safe=juce::Component::SafePointer<Panel>(this)](int result){
+            const juce::Component::SafePointer<Panel> safe(this);
+            m.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(&menu),[safe](int result){
                 if(safe==nullptr)return;
                 if(result==1)safe->fileDialog(false);
                 if(result==2){auto* p=safe->processor.state.getParameter("bypass");p->beginChangeGesture();safe->processor.set("bypass",1-safe->processor.value("bypass"));p->endChangeGesture();}
                 if(result>=3&&result<=5){const int w=result==3?796:result==4?1060:1592;safe->setSize(w,juce::roundToInt(double(w)*hardware::height/hardware::width));}
                 if(result==6)juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,"MixDown Study","AulaMix • visual panel 0.2.0\nOriginal 1592 × 988 artwork embedded without modification.\nIndependent DSP approximation; not the original Waves algorithm.");
             });
-        };
     }
     void fileDialog(bool saving)
     {
         chooser=std::make_unique<juce::FileChooser>(saving?"Save MixDown preset":"Load MixDown preset",juce::File{},"*.mixdown");
+        const juce::Component::SafePointer<Panel> safe(this);
         chooser->launchAsync(saving?juce::FileBrowserComponent::saveMode|juce::FileBrowserComponent::canSelectFiles|juce::FileBrowserComponent::warnAboutOverwriting:
                                      juce::FileBrowserComponent::openMode|juce::FileBrowserComponent::canSelectFiles,
-            [safe=juce::Component::SafePointer<Panel>(this),saving](const juce::FileChooser& dialog){
+            [safe,saving](const juce::FileChooser& dialog){
                 if(safe==nullptr)return;auto f=dialog.getResult();if(f==juce::File{})return;
                 bool success=false;
                 if(saving){juce::MemoryBlock b;safe->processor.getStateInformation(b);success=f.withFileExtension("mixdown").replaceWithData(b.getData(),b.getSize());}

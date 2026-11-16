@@ -20,6 +20,8 @@ juce_add_plugin(MixDownStudy COMPANY_NAME AulaMix PLUGIN_MANUFACTURER_CODE Amix
 target_sources(MixDownStudy PRIVATE Source/Plugin.cpp)
 target_compile_definitions(MixDownStudy PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0)
+set_property(SOURCE Source/Plugin.cpp APPEND PROPERTY COMPILE_OPTIONS
+    "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 target_link_libraries(MixDownStudy PRIVATE MixDownArtwork juce::juce_audio_utils juce::juce_dsp
     PUBLIC juce::juce_recommended_config_flags)
 enable_testing()
@@ -29,7 +31,9 @@ target_include_directories(MixDownSmoke PRIVATE "${juce_SOURCE_DIR}/modules")
 target_compile_definitions(MixDownSmoke PRIVATE JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
 target_link_libraries(MixDownSmoke PRIVATE MixDownStudy)
 add_test(NAME AudioSmoke COMMAND MixDownSmoke)
-juce_add_console_app(MixDownUiSmoke PRODUCT_NAME "MixDown UI Smoke")
+# This test runs JUCEApplication and must use the same Windows GUI entry point
+# as the linked JUCE event-loop code, rather than the console main(argc, argv).
+juce_add_gui_app(MixDownUiSmoke PRODUCT_NAME "MixDown UI Smoke")
 target_sources(MixDownUiSmoke PRIVATE Tests/UiSmoke.cpp)
 target_include_directories(MixDownUiSmoke PRIVATE "${juce_SOURCE_DIR}/modules")
 target_compile_definitions(MixDownUiSmoke PRIVATE JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
