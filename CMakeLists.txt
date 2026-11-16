@@ -15,3 +15,10 @@ target_compile_definitions(MixDownStudy PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=
     JUCE_VST3_CAN_REPLACE_VST2=0)
 target_link_libraries(MixDownStudy PRIVATE juce::juce_audio_utils juce::juce_dsp
     PUBLIC juce::juce_recommended_config_flags)
+enable_testing()
+juce_add_console_app(MixDownSmoke PRODUCT_NAME "MixDown Smoke")
+target_sources(MixDownSmoke PRIVATE Tests/AudioSmoke.cpp)
+target_include_directories(MixDownSmoke PRIVATE "${juce_SOURCE_DIR}/modules")
+target_compile_definitions(MixDownSmoke PRIVATE JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
+target_link_libraries(MixDownSmoke PRIVATE MixDownStudy)
+add_test(NAME AudioSmoke COMMAND MixDownSmoke)

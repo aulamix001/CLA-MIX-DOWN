@@ -4,7 +4,10 @@ Protótipo independente em JUCE 8.0.12. O DSP é uma aproximação, não o algor
 Waves. A interface é desenhada em código; as imagens originais permanecem
 intactas. Esta versão não promete equivalência visual ou sonora.
 
-No GitHub, abra Actions → Windows VST3 → execução concluída → Artifacts →
+No GitHub, abra Releases e baixe `MixDown-Study-Windows-x64.zip` na versão
+Windows x64 prototype. O pacote é publicado somente após compilação e testes.
+
+Alternativamente, abra Actions → Windows VST3 → execução concluída → Artifacts →
 MixDown-Study-Windows-x64. É necessário login GitHub para baixar artifacts.
 Descompacte o ZIP de artifacts e o ZIP do produto nele contido.
 

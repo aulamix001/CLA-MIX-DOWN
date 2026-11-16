@@ -3,9 +3,12 @@
 Base técnica para uma implementação VST3/Standalone em C++/JUCE, com controles
 orientados pelo manual e pelos XMLs fornecidos pelo usuário.
 
-Estado atual: análise dos parâmetros, presets, módulos internos e interface.
-O plugin ainda não foi implementado/compilado; os relatórios não demonstram
-equivalência sonora com o produto de referência.
+Estado atual: protótipo JUCE com controles automatizáveis, oito presets,
+processamento aproximado e workflow de compilação Windows x64. A interface
+é desenhada em código; ainda não reproduz o painel de referência. Não há
+equivalência sonora demonstrada com o produto original.
+
+- [Compilação e download do VST3 Windows](docs/WINDOWS.md)
 
 - [Análise dos presets e controles](docs/ANALISE_PRESETS.md)
 - [Tabela dos oito presets](docs/analysis/presets.csv)

@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: windows-2022
@@ -13,7 +13,9 @@ jobs:
       - name: Configure Windows x64
         run: cmake -S . -B build -A x64
       - name: Build VST3 and Standalone
-        run: cmake --build build --config Release --target MixDownStudy_VST3 MixDownStudy_Standalone --parallel 2
+        run: cmake --build build --config Release --target MixDownStudy_VST3 MixDownStudy_Standalone MixDownSmoke --parallel 2
+      - name: Audio smoke tests
+        run: ctest --test-dir build -C Release --output-on-failure
       - name: Package
         shell: pwsh
         run: |
@@ -22,6 +24,12 @@ jobs:
           Copy-Item 'build/MixDownStudy_artefacts/Release/Standalone/MixDown Study.exe' package
           Copy-Item 'docs/WINDOWS.md' package
           Compress-Archive -Path 'package/*' -DestinationPath 'MixDown-Study-Windows-x64.zip'
+      - name: Publish downloadable prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create "windows-${{ github.run_number }}" 'MixDown-Study-Windows-x64.zip' --repo '${{ github.repository }}' --target '${{ github.sha }}' --prerelease --title 'Windows x64 prototype #${{ github.run_number }}' --notes 'Independent JUCE prototype with eight XML-derived presets. DSP and interface are approximations. Includes VST3 x64 and Standalone. Original images unchanged.'
       - uses: actions/upload-artifact@v4
         with:
           name: MixDown-Study-Windows-x64
