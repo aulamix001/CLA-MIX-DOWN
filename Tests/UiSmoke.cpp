@@ -102,6 +102,7 @@ private:
             }
             else
             {
+                stopTimer();
                 capture("panel-small-796.png");
                 std::cout<<"PASS: artwork rendering at 3 sizes; faders; bypass; VU modes; Glue modes; A/B copy/recall; preset navigation.\n";
                 setApplicationReturnValue(0);quit();

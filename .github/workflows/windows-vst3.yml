@@ -21,7 +21,17 @@ jobs:
       - name: Configure Windows x64
         run: cmake -S . -B build -A x64
       - name: Build VST3 and Standalone
-        run: cmake --build build --config Release --target MixDownStudy_VST3 MixDownStudy_Standalone MixDownSmoke MixDownUiSmoke --parallel 2
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --target MixDownStudy_VST3 MixDownStudy_Standalone MixDownSmoke MixDownUiSmoke --parallel 2 2>&1 | Tee-Object -FilePath windows-build.log
+          $buildExitCode = $LASTEXITCODE
+          if ($buildExitCode -ne 0) {
+            Get-Content windows-build.log | Where-Object { $_ -match 'error (C[0-9]+|LNK[0-9]+|MSB[0-9]+)|fatal error' } | Select-Object -First 20 | ForEach-Object {
+              $message = $_.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+              Write-Output "::error title=Windows compiler::$message"
+            }
+          }
+          exit $buildExitCode
       - name: Audio and interface smoke tests
         run: ctest --test-dir build -C Release --output-on-failure
       - name: Package
@@ -52,3 +62,11 @@ jobs:
           name: UI-snapshots
           path: build/ui-snapshots/**/*.png
           if-no-files-found: ignore
+      - uses: actions/cache/save@v4
+        if: failure()
+        with:
+          path: |
+            build
+            !build/ui-snapshots
+            !build/Testing
+          key: windows-msvc-juce8-${{ hashFiles('CMakeLists.txt', 'Source/**', 'Tests/**', 'assets/**') }}
