@@ -10,11 +10,19 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            build
+            !build/ui-snapshots
+            !build/Testing
+          key: windows-msvc-juce8-${{ hashFiles('CMakeLists.txt', 'Source/**', 'Tests/**', 'assets/**') }}
+          restore-keys: windows-msvc-juce8-
       - name: Configure Windows x64
         run: cmake -S . -B build -A x64
       - name: Build VST3 and Standalone
-        run: cmake --build build --config Release --target MixDownStudy_VST3 MixDownStudy_Standalone MixDownSmoke --parallel 2
-      - name: Audio smoke tests
+        run: cmake --build build --config Release --target MixDownStudy_VST3 MixDownStudy_Standalone MixDownSmoke MixDownUiSmoke --parallel 2
+      - name: Audio and interface smoke tests
         run: ctest --test-dir build -C Release --output-on-failure
       - name: Package
         shell: pwsh
@@ -29,10 +37,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: |
-          gh release create "windows-${{ github.run_number }}" 'MixDown-Study-Windows-x64.zip' --repo '${{ github.repository }}' --target '${{ github.sha }}' --prerelease --title 'Windows x64 prototype #${{ github.run_number }}' --notes 'Independent JUCE prototype with eight XML-derived presets. DSP and interface are approximations. Includes VST3 x64 and Standalone. Original images unchanged.'
+          $preview = Get-ChildItem 'build/ui-snapshots' -Recurse -Filter 'panel-default.png' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $preview) { throw 'The current UI test did not produce its preview.' }
+          gh release create "windows-${{ github.run_number }}" 'MixDown-Study-Windows-x64.zip' $preview.FullName --repo '${{ github.repository }}' --target '${{ github.sha }}' --prerelease --title 'Windows x64 visual panel 0.2 #${{ github.run_number }}' --notes 'High-resolution original panel artwork embedded byte for byte. Animated VUs, LED meters, hardware faders, section switches, IN/GR/OUT, A/B, presets and toolbar. Includes VST3 x64 and Standalone. Audio and UI smoke tests passed. DSP remains an independent approximation.'
       - uses: actions/upload-artifact@v4
         with:
           name: MixDown-Study-Windows-x64
           path: MixDown-Study-Windows-x64.zip
           if-no-files-found: error
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: UI-snapshots
+          path: build/ui-snapshots/**/*.png
+          if-no-files-found: ignore
