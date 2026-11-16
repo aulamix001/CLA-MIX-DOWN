@@ -1,0 +1,9 @@
+preset,input,output,bass,treble,glue,drive,bass_on,treble_on,drive_on,glue_state,glue_display_on,glue_selection,vu_cal,meter_mode,link_io
+Start Me Up,0,0,0,0,0,0,1,1,1,1,1,0,18,1,ABSENT
+Full Reset,0,0,0,0,0,0,1,1,1,1,1,0,18,1,ABSENT
+Drive Me Home,0,0,-4.2000000000000001776,4.4000000000000003553,1.3999999999999999112,7.0999999999999996447,1,1,1,1,1,0,18,1,ABSENT
+Clearview,0,0,0,6,1,0,0,1,0,1,1,0,18,1,ABSENT
+Bounce Master,0,0,0,3,1,-3,1,1,1,1,1,0,18,1,ABSENT
+Tear the Top Off,0,0,0,6,0,6,0,1,1,1,1,0,18,1,ABSENT
+The Big Man,0,0,6,0,0,0,1,1,0,2,1,1,18,1,ABSENT
+Mr Squeeze,0,0,0,0,10,10,0,0,1,1,1,0,18,1,ABSENT
